@@ -20,7 +20,7 @@ public class EmailPlugin
         _graphApiEmailClient = graphApiEmailClient;
     }
 
-    [KernelFunction, Description("Send the database results excel file as email. Use this function only if the goal is to email the database results.")]
+    [KernelFunction, Description("Send the database results excel file as email. Do not look for the email id of the recipient. Use this function only if the goal is to email the database results.")]
     public async Task<string> Sendemail(
         [Description("The database results excel file full path")] string excelFilePath,
         [Description("The email recipient")] string emailRecipient)

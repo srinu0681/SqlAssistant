@@ -46,7 +46,7 @@ public class SemanticKernelBot : StateManagementBot
         if (_sqlConnectionFactory != null)
         {
             _kernel.ImportPluginFromObject(new SQLPlugin(conversationData, turnContext, _sqlConnectionFactory), "SQLPlugin");
-            _kernel.ImportPluginFromObject(new ExcelExportPlugin(turnContext, _excelBuilder), "ExcelExportPlugin");
+            _kernel.ImportPluginFromObject(new ExcelExportPlugin(turnContext, conversationData, _excelBuilder), "ExcelExportPlugin");
         }
 
         _kernel.ImportPluginFromObject(new EmailPlugin(_configOptions, _graphApiEmailClient, turnContext), "EmailPlugin");
@@ -90,6 +90,9 @@ public class SemanticKernelBot : StateManagementBot
         var result = await _planner.ExecuteAsync(_kernel, prompt);
 
         _logger.LogInformation(new EventId(1001, "EndPlanExecution"), "{Final Answer} | {Chat history}", result.FinalAnswer, System.Text.Json.JsonSerializer.Serialize(result.ChatHistory));
+
+        if (String.IsNullOrWhiteSpace(result.FinalAnswer))
+            return "Completed task";
 
         return result.FinalAnswer;
     }

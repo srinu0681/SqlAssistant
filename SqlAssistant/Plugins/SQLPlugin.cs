@@ -10,9 +10,11 @@ public class SQLPlugin
 {
     private readonly SqlConnectionFactory _sqlConnectionFactory;
     private ITurnContext<IMessageActivity> _turnContext;
+    private readonly ConversationData _conversationData;
     public SQLPlugin(ConversationData conversationData, ITurnContext<IMessageActivity> turnContext, SqlConnectionFactory sqlConnectionFactory)
     {
         _turnContext = turnContext;
+        _conversationData = conversationData;
         _sqlConnectionFactory = sqlConnectionFactory;
     }
 
@@ -38,6 +40,7 @@ public class SQLPlugin
     {
         await _turnContext.SendActivityAsync($"Running query...");
         await _turnContext.SendActivityAsync(query);
+        _conversationData.History.Add(new ConversationTurn { Role = "assistant", Message = $"Query used: {query}" });
         return GetDatabaseResultsAsCSV(query);
     }
 
