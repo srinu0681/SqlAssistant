@@ -20,24 +20,24 @@ public class EmailPlugin
         _graphApiEmailClient = graphApiEmailClient;
     }
 
-    [KernelFunction, Description("Send the database results excel file as email. Do not look for the email id of the recipient. Use this function only if the goal is to email the database results.")]
+    [KernelFunction, Description("Send the database results excel file as email. Use this function only if the goal is to email the database results.")]
     public async Task<string> Sendemail(
         [Description("The database results excel file full path")] string excelFilePath,
-        [Description("The email recipient")] string emailRecipient)
+        [Description("The email id of the recipient")] string recipientEmailId)
     {
-        await _turnContext.SendActivityAsync($"Sending Email...");
+        await _turnContext.SendActivityAsync($"Sending email to {recipientEmailId}...");
 
         if (!System.IO.File.Exists(excelFilePath))
             return "Failed to send email as the excel file does not exist";
 
-        if (String.IsNullOrWhiteSpace(emailRecipient))
+        if (String.IsNullOrWhiteSpace(recipientEmailId))
             return "Can not send email as the email recipient was not provided";
 
         var bytes = System.IO.File.ReadAllBytes(excelFilePath);
 
         try
         {
-            await _graphApiEmailClient.SendAsync(new List<string> { _configOptions.Graph_EmailTo }, "Query Results", "Database results", Path.GetFileName(excelFilePath), bytes);
+            await _graphApiEmailClient.SendAsync(new List<string> { recipientEmailId }, "Query Results", "Database results", Path.GetFileName(excelFilePath), bytes);
         }
         catch(Exception ex)
         {
@@ -45,5 +45,12 @@ public class EmailPlugin
         }
 
         return "Email sent successfully";
+    }
+
+    [KernelFunction, Description("Get the email id of the recipient. Use this function only if the email id is not provided.")]
+    public async Task<string> GetEmailId([Description("The email recipient name or designation")]string recipient)
+    {
+        await _turnContext.SendActivityAsync($"Getting Email Id of {recipient}...");
+        return _configOptions.Graph_EmailTo;
     }
 }

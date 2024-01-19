@@ -1,0 +1,228 @@
+Step 1
+
+Prompt: 
+<message role="system">
+You are an expert at generating plans from a given GOAL. Think step by step and determine a plan to satisfy the specified GOAL using only the FUNCTIONS provided to you. You can also make use of your own knowledge while forming an answer but you must not use functions that are not provided. Once you have come to a final answer, use the UserInteraction_SendFinalAnswer function to communicate this back to the user.
+
+[FUNCTIONS]
+
+[{"name":"EmailPlugin_GetEmailId","description":"Get the email id of the recipient. Use this function only if the email id is not provided.","parameters":{"type":"object","required":["recipient"],"properties":{"recipient":{"type":"string","description":"The email recipient name or designation"}}},"responses":{}},{"name":"EmailPlugin_Sendemail","description":"Send the database results excel file as email. Use this function only if the goal is to email the database results.","parameters":{"type":"object","required":["excelFilePath","recipientEmailId"],"properties":{"excelFilePath":{"type":"string","description":"The database results excel file full path"},"recipientEmailId":{"type":"string","description":"The email id of the recipient"}}},"responses":{}},{"name":"ExcelExportPlugin_RunQueryAndCreateExcel","description":"Run SQL against the AdventureWorksLT database and export the datasbe results to excel. Use the query in chat history if it is available. Use this function only if the final goal is to send email.","parameters":{"type":"object","required":["query"],"properties":{"query":{"type":"string","description":"The query to run on SQL Server. When referencing tables, make sure to add the schema names."}}},"responses":{}},{"name":"ExcelExportPlugin_RunQueryAndExportToExcel","description":"Run SQL against the AdventureWorksLT database. Use the query in chat history if it is available. Use this function only if the final goal is to export the database results to excel.","parameters":{"type":"object","required":["query"],"properties":{"query":{"type":"string","description":"The query to run on SQL Server. When referencing tables, make sure to add the schema names."}}},"responses":{}},{"name":"SQLPlugin_GetSchema","description":"Obtain the database schema for a table in AdventureWorksLT.","parameters":{"type":"object","required":["tableName"],"properties":{"tableName":{"type":"string","description":"The table to get the schema for. Do not include the schema name."}}},"responses":{}},{"name":"SQLPlugin_GetTables","description":"Obtain the table names in AdventureWorksLT, which contains customer and sales data. Always run this before running other queries instead of assuming the user mentioned the correct name. Remember the salesperson information is contained in the Customer table.","parameters":{"type":"object","required":[],"properties":{}},"responses":{}},{"name":"SQLPlugin_RunQuery","description":"Run SQL against the AdventureWorksLT database. Use this function only if the goal does not contain exporting to excel or sending email.","parameters":{"type":"object","required":["query"],"properties":{"query":{"type":"string","description":"The query to run on SQL Server. When referencing tables, make sure to add the schema names."}}},"responses":{}},{"name":"UserInteraction_SendFinalAnswer","description":"This function is used to send the final answer of a plan to the user.","parameters":{"type":"object","required":["answer"],"properties":{"answer":{"type":"string","description":"The final answer"}}},"responses":{}}]
+
+[END FUNCTIONS]
+
+To create the plan, follow these steps:
+0. Each step should be something that is capable of being done by the list of available functions.
+1. Steps can use output from one or more previous steps as input, if appropriate.
+2. The plan should be as short as possible.
+</message>
+<message role="user">USER:
+Can you get the top 5 highly sold products in last year and email the results to my manager?
+ASSISTANT:</message>
+
+Completion:
+<message role="assistant">
+ASSISTANT:To achieve the goal of getting the top 5 highly sold products from last year and emailing the results to your manager, we will follow these steps:
+
+1. Use the `SQLPlugin_GetTables` function to obtain the table names in the AdventureWorksLT database that contain customer and sales data.
+
+2. Once we have the table names, we will construct an SQL query to find the top 5 highly sold products from the last year. This query will likely involve tables that contain product information and sales data, and will use aggregate functions to calculate the total sales for each product, and then order the results by the total sales in descending order, limiting the results to the top 5.
+
+3. Use the `ExcelExportPlugin_RunQueryAndCreateExcel` function to run the SQL query against the AdventureWorksLT database and export the results to an Excel file.
+
+4. Use the `EmailPlugin_GetEmailId` function to get the email id of your manager by providing their name or designation.
+
+5. Once we have the manager's email id and the path to the Excel file containing the query results, we will use the `EmailPlugin_Sendemail` function to send the Excel file to your manager's email address.
+
+6. Finally, we will use the `UserInteraction' function to send the final answer
+Please note that
+
+The user will ask you for help with each step.
+</message>
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Step 2
+
+Prompt:
+<message role="user">USER: Perform the next step of the plan if there is more work to do. When you have reached a final answer, use the UserInteraction_SendFinalAnswer</message>
+
+Completion:
+<message role="assistant">
+	{
+		"ChatResponseMessage.FunctionToolCalls": [
+		  {
+			"Name": "SQLPlugin_GetTables",
+			"Arguments": "{}",
+			"Id": "call_hZAIggzC8it3BNSINmXg6iIx"
+		  }
+		]
+	}
+</message>
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Step 3
+
+Prompt:
+<message role="tool">
+	{
+		"Content": "[DATABASE RESULTS] \nTABLE_SCHEMA,TABLE_NAME\nsys,database_firewall_rules\nSalesLT,Customer\nSalesLT,ProductModel\nSalesLT,vProductModelCatalogDescription\nSalesLT,ProductDescription\nSalesLT,Product\nSalesLT,ProductModelProductDescription\nSalesLT,vProductAndDescription\nSalesLT,ProductCategory\nSalesLT,vGetAllCategories\ndbo,BuildVersion\ndbo,ErrorLog\nSalesLT,Address\nSalesLT,CustomerAddress\nSalesLT,SalesOrderDetail\nSalesLT,SalesOrderHeader\n",  
+		"Metadata": {
+			"ChatCompletionsToolCall.Id": "call_hZAIggzC8it3BNSINmXg6iIx"
+		}		
+	}
+</message>
+<message role="user">USER: Perform the next step of the plan if there is more work to do. When you have reached a final answer, use the UserInteraction_SendFinalAnswer</message>
+
+Completion:
+<message role="assistant">
+	{
+		"Content": "To construct the SQL query needed to find the top 5 highly sold products from last year, we will utilize the tables \u0060SalesLT.Product\u0060, \u0060SalesLT.SalesOrderDetail\u0060, and \u0060SalesLT.SalesOrderHeader\u0060. These tables likely contain the information required to calculate the number of sales per product for the last year. \n\nBefore we write the query, let\u0027s verify the schemas for \u0060SalesLT.Product\u0060, \u0060SalesLT.SalesOrderDetail\u0060, and \u0060SalesLT.SalesOrderHeader\u0060 tables to ensure we reference the correct columns. \n\nI will now proceed to get the schema for these tables.",
+		"ChatResponseMessage.FunctionToolCalls": [
+		  {
+			"Name": "SQLPlugin_GetSchema",
+			"Arguments": "{\u0022tableName\u0022: \u0022Product\u0022}",
+			"Id": "call_pBr8auM9miAdJn4htzMoNnPY"
+		  },
+		  {
+			"Name": "SQLPlugin_GetSchema",
+			"Arguments": "{\u0022tableName\u0022: \u0022SalesOrderDetail\u0022}",
+			"Id": "call_old6v2Ycf1CTAt4jyTzZGR4n"
+		  },
+		  {
+			"Name": "SQLPlugin_GetSchema",
+			"Arguments": "{\u0022tableName\u0022: \u0022SalesOrderHeader\u0022}",
+			"Id": "call_uhi7apdM7gXfFpmMsJb0Syvs"
+		  }
+		]
+	}
+</message>
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Step 4
+
+Prompt:
+<message role="tool">
+	{
+		"Content": "[DATABASE RESULTS] \nTABLE_SCHEMA,TABLE_NAME,COLUMN_NAME\nSalesLT,Product,ProductID\nSalesLT,Product,Name\nSalesLT,Product,ProductNumber\nSalesLT,Product,Color\nSalesLT,Product,StandardCost\nSalesLT,Product,ListPrice\nSalesLT,Product,Size\nSalesLT,Product,Weight\nSalesLT,Product,ProductCategoryID\nSalesLT,Product,ProductModelID\nSalesLT,Product,SellStartDate\nSalesLT,Product,SellEndDate\nSalesLT,Product,DiscontinuedDate\nSalesLT,Product,ThumbNailPhoto\nSalesLT,Product,ThumbnailPhotoFileName\nSalesLT,Product,rowguid\nSalesLT,Product,ModifiedDate\n",  
+		"Metadata": {
+			"ChatCompletionsToolCall.Id": "call_pBr8auM9miAdJn4htzMoNnPY"
+		}		
+	}
+</message>
+<message role="tool">
+	{
+		"Content": "[DATABASE RESULTS] \nTABLE_SCHEMA,TABLE_NAME,COLUMN_NAME\nSalesLT,SalesOrderDetail,SalesOrderID\nSalesLT,SalesOrderDetail,SalesOrderDetailID\nSalesLT,SalesOrderDetail,OrderQty\nSalesLT,SalesOrderDetail,ProductID\nSalesLT,SalesOrderDetail,UnitPrice\nSalesLT,SalesOrderDetail,UnitPriceDiscount\nSalesLT,SalesOrderDetail,LineTotal\nSalesLT,SalesOrderDetail,rowguid\nSalesLT,SalesOrderDetail,ModifiedDate\n",  
+		"Metadata": {
+			"ChatCompletionsToolCall.Id": "call_old6v2Ycf1CTAt4jyTzZGR4n"
+		}		
+	}
+</message>
+<message role="tool">
+	{
+		"Content": "[DATABASE RESULTS] \nTABLE_SCHEMA,TABLE_NAME,COLUMN_NAME\nSalesLT,SalesOrderHeader,SalesOrderID\nSalesLT,SalesOrderHeader,RevisionNumber\nSalesLT,SalesOrderHeader,OrderDate\nSalesLT,SalesOrderHeader,DueDate\nSalesLT,SalesOrderHeader,ShipDate\nSalesLT,SalesOrderHeader,Status\nSalesLT,SalesOrderHeader,OnlineOrderFlag\nSalesLT,SalesOrderHeader,SalesOrderNumber\nSalesLT,SalesOrderHeader,PurchaseOrderNumber\nSalesLT,SalesOrderHeader,AccountNumber\nSalesLT,SalesOrderHeader,CustomerID\nSalesLT,SalesOrderHeader,ShipToAddressID\nSalesLT,SalesOrderHeader,BillToAddressID\nSalesLT,SalesOrderHeader,ShipMethod\nSalesLT,SalesOrderHeader,CreditCardApprovalCode\nSalesLT,SalesOrderHeader,SubTotal\nSalesLT,SalesOrderHeader,TaxAmt\nSalesLT,SalesOrderHeader,Freight\nSalesLT,SalesOrderHeader,TotalDue\nSalesLT,SalesOrderHeader,Comment\nSalesLT,SalesOrderHeader,rowguid\nSalesLT,SalesOrderHeader,ModifiedDate\n",  
+		"Metadata": {
+			"ChatCompletionsToolCall.Id": "call_uhi7apdM7gXfFpmMsJb0Syvs"
+		}		
+	}
+</message>
+<message role="user">USER: Perform the next step of the plan if there is more work to do. When you have reached a final answer, use the UserInteraction_SendFinalAnswer</message>
+
+Completion:
+<message role="assistant">
+	{
+		"Content": "With the schema information for the \u0060SalesLT.Product\u0060, \u0060SalesLT.SalesOrderDetail\u0060, and \u0060SalesLT.SalesOrderHeader\u0060 tables, we can now construct an SQL query. The query will join these tables to calculate the total quantity of each product sold in the last year, order the results by the quantity sold in descending order, and select the top 5 results.\n\nThe SQL query will be as follows:\n\n\u0060\u0060\u0060sql\nSELECT TOP 5 \n    P.ProductID, \n    P.Name, \n    SUM(SOD.OrderQty) AS TotalQuantitySold\nFROM \n    SalesLT.Product AS P\nJOIN \n    SalesLT.SalesOrderDetail AS SOD ON P.ProductID = SOD.ProductID\nJOIN \n    SalesLT.SalesOrderHeader AS SOH ON SOD.SalesOrderID = SOH.SalesOrderID\nWHERE \n    SOH.OrderDate \u003E= DATEADD(year, -1, GETDATE())\nGROUP BY \n    P.ProductID, \n    P.Name\nORDER BY \n    TotalQuantitySold DESC\n\u0060\u0060\u0060\n\nThis query will retrieve the \u0060ProductID\u0060 and \u0060Name\u0060 from the \u0060Product\u0060 table and the sum of \u0060OrderQty\u0060 from the \u0060SalesOrderDetail\u0060 table. It filters the sales from the last year using the \u0060OrderDate\u0060 column from the \u0060SalesOrderHeader\u0060 table and groups the results by \u0060ProductID\u0060 and \u0060Name\u0060. \n\nNow, I will run the query using the ExcelExportPlugin_RunQueryAndCreateExcel function to export the result to an Excel file.",
+		"ChatResponseMessage.FunctionToolCalls": [
+		  {
+			"Name": "ExcelExportPlugin_RunQueryAndCreateExcel",
+			"Arguments": "{\u0022query\u0022:\u0022SELECT TOP 5 \\n    P.ProductID, \\n    P.Name, \\n    SUM(SOD.OrderQty) AS TotalQuantitySold\\nFROM \\n    SalesLT.Product AS P\\nJOIN \\n    SalesLT.SalesOrderDetail AS SOD ON P.ProductID = SOD.ProductID\\nJOIN \\n    SalesLT.SalesOrderHeader AS SOH ON SOD.SalesOrderID = SOH.SalesOrderID\\nWHERE \\n    SOH.OrderDate \u003E= DATEADD(year, -1, GETDATE())\\nGROUP BY \\n    P.ProductID, \\n    P.Name\\nORDER BY \\n    TotalQuantitySold DESC\u0022}",
+			"Id": "call_Zg2qL3jGzgpUcam3c7H4csyW"
+		  }
+		]
+	}
+</message>
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Step 5
+
+Prompt:
+<message role="tool">
+	{
+		"Content": "databaseresults_1172024-21941.xlsx",
+		"Metadata": {
+			"ChatCompletionsToolCall.Id": "call_Zg2qL3jGzgpUcam3c7H4csyW"
+		}
+	}
+</message>
+<message role="user">USER: Perform the next step of the plan if there is more work to do. When you have reached a final answer, use the UserInteraction_SendFinalAnswer</message>
+
+Completion:
+<message role="assistant">
+	{
+		"ChatResponseMessage.FunctionToolCalls": [
+		  {
+			"Name": "EmailPlugin_GetEmailId",
+			"Arguments": "{\u0022recipient\u0022:\u0022manager\u0022}",
+			"Id": "call_kUUVURCgUKXBC2Jd887r4UGk"
+		  }
+		]
+	}
+</message>	
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Step 6
+
+Prompt:
+<message role="tool">
+	{
+		"Content": "mark.anthony@gmail.com",
+		"Metadata": {
+			"ChatCompletionsToolCall.Id": "call_kUUVURCgUKXBC2Jd887r4UGk"
+		}
+	}
+</message>
+<message role="user">USER: Perform the next step of the plan if there is more work to do. When you have reached a final answer, use the UserInteraction_SendFinalAnswer</message>
+
+Completion:
+<message role="assistant">
+	{
+		"ChatResponseMessage.FunctionToolCalls": [
+		  {
+			"Name": "EmailPlugin_Sendemail",
+			"Arguments": "{\u0022excelFilePath\u0022:\u0022databaseresults_1172024-21941.xlsx\u0022,\u0022recipientEmailId\u0022:\u0022mark.anthony@gmail.com\u0022}",
+			"Id": "call_qPmrIPwOL41l8rbqc7KlAh0O"
+		  }
+		]
+	}
+</message>
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Step 7
+
+Prompt:
+<message role="tool">
+	{
+		"Content": "Email sent successfully",
+		"Metadata": {
+			"ChatCompletionsToolCall.Id": "call_qPmrIPwOL41l8rbqc7KlAh0O"
+		}
+	}
+</message>
+<message role="user">USER: Perform the next step of the plan if there is more work to do. When you have reached a final answer, use the UserInteraction_SendFinalAnswer</message>
+
+Completion:
+<message role="assistant">
+	{
+		"ChatResponseMessage.FunctionToolCalls": [
+		  {
+			"Name": "UserInteraction_SendFinalAnswer",
+			"Arguments": "{\u0022answer\u0022:\u0022The top 5 highly sold products from last year have been successfully retrieved and emailed to your manager.\u0022}",
+			"Id": "call_sdV5KgrTEvPeX8ROFCp4zEJT"
+		  }
+		]
+	}
+</message>	

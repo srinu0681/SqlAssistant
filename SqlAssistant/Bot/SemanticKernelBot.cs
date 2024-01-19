@@ -78,8 +78,8 @@ public class SemanticKernelBot : StateManagementBot
 
         var stepwiseConfig = new FunctionCallingStepwisePlannerConfig
         {
-            MaxIterations = 5,
-            MaxTokens = 8000,
+            MaxIterations = 10,
+            MaxTokens = 20000,
         };
 
         _planner = new FunctionCallingStepwisePlanner(stepwiseConfig);
