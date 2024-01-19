@@ -24,5 +24,6 @@ bld/
 # Notification local store
 .notification.localstore.json
 
-.vs
+.vs/
+/SqlAssistant/.vs
 /SqlAssistant/Excel
